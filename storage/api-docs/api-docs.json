@@ -174,12 +174,182 @@
                     }
                 }
             }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List all products",
+                "description": "Display a listing of the resource.",
+                "operationId": "6d8ae74dcafe19c4813904d4ea9e4c57",
+                "responses": {
+                    "200": {
+                        "description": "List all products"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "9f0b814cd8d69075ed70d4cc79c9f417",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Produto A"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 99.99
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/products/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Show the product by ID",
+                "description": "Display the specified resource.",
+                "operationId": "f6410f1810b0a90ba3d72d5b8250a27d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Update the product",
+                "description": "Update product by ID. You can send only the fields you want to update.",
+                "operationId": "14b6ff17cc6ce7298a06271a8bc89539",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Produto Atualizado"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 89.99
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete the product",
+                "description": "Deletes a product by their ID.",
+                "operationId": "3dda9543e42196cc1ff7b18d2c9f9357",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Product deleted successfully"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
             "name": "Clients",
             "description": "Clients"
+        },
+        {
+            "name": "Products",
+            "description": "Products"
         }
     ]
 }
