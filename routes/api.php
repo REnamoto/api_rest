@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClientsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +17,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// CRUD completo para ClientsController (GET, POST, PUT, DELETE, etc.)
+Route::apiResource('clients', ClientsController::class);
+
+// Documentação Swagger (frontend do Swagger UI)
+Route::get('/api/documentation', function () {
+    return view('l5-swagger::index');
 });
