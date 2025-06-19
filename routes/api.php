@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\OrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,9 @@ Route::apiResource('clients', ClientsController::class);
 
 // CRUD completo para ProductsController (GET, POST, PUT, DELETE, etc.)
 Route::apiResource('products', ProductsController::class);
+
+// CRUD completo para OrdersController (GET, POST, PUT, DELETE, etc.)
+Route::apiResource('orders', OrdersController::class);
 
 // Documentação Swagger (frontend do Swagger UI)
 Route::get('/api/documentation', function () {
