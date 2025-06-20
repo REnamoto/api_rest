@@ -213,6 +213,10 @@
                                     "product_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 1
                                     }
                                 },
                                 "type": "object"
@@ -289,6 +293,10 @@
                                         "example": 1
                                     },
                                     "product_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quantity": {
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -504,6 +512,170 @@
                     }
                 }
             }
+        },
+        "/api/products_stocks": {
+            "get": {
+                "tags": [
+                    "ProductsStocks"
+                ],
+                "summary": "List all products stocks",
+                "description": "Display a listing of the resource.",
+                "operationId": "138b3ec7502d8b788f3eaccd781b0e7e",
+                "responses": {
+                    "200": {
+                        "description": "List all products stocks"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "ProductsStocks"
+                ],
+                "summary": "Create a new product stock",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "ac628059e6829a6c978117d89f1d6b4d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "product_id",
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "product_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product stock created successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/products_stocks/{id}": {
+            "get": {
+                "tags": [
+                    "ProductsStocks"
+                ],
+                "summary": "Show the product stock by ID",
+                "description": "Display the specified resource.",
+                "operationId": "686af5d0ef3301ecdf1b6bcbbc61b77d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product stock to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product stock retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Product stock not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "ProductsStocks"
+                ],
+                "summary": "Update the product stock",
+                "description": "Update product stock by ID. You can send only the fields you want to update.",
+                "operationId": "92de5d21873005745cdfefd260778541",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product stock to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "product_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product stock updated successfully"
+                    },
+                    "404": {
+                        "description": "Product stock not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "ProductsStocks"
+                ],
+                "summary": "Delete the product stock",
+                "description": "Deletes a product stock by their ID.",
+                "operationId": "1ff5cbc0745ec1fa5062fd2682d59e09",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product stock to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Product stock deleted successfully"
+                    },
+                    "404": {
+                        "description": "Product stock not found"
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -518,6 +690,10 @@
         {
             "name": "Products",
             "description": "Products"
+        },
+        {
+            "name": "ProductsStocks",
+            "description": "ProductsStocks"
         }
     ]
 }

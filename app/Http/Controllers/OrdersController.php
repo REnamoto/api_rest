@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Orders;
+use App\Models\ProductsStocks;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrdersController extends Controller
 {
@@ -47,7 +49,8 @@ class OrdersController extends Controller
      *         @OA\JsonContent(
      *             required={"client_id", "product_id"},
      *             @OA\Property(property="client_id", type="integer", example=1),
-     *             @OA\Property(property="product_id", type="integer", example=1)
+     *             @OA\Property(property="product_id", type="integer", example=1),
+     *             @OA\Property(property="quantity", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -68,9 +71,26 @@ class OrdersController extends Controller
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
         ]);
 
+        // Verify if there is enough stock
+        $stock = ProductsStocks::where('product_id', $validated['product_id'])->first();
+
+        if (!$stock) {
+            return response()->json(['message' => 'Stock not found for the product.'], 404);
+        }
+
+        if ($stock->stock < $validated['quantity']) {
+            return response()->json(['message' => 'Not enough stock available.'], 422);
+        }
+
+        // Create the order
         $order = Orders::create($validated);
+
+        // Update the stock
+        $stock->stock -= $validated['quantity'];
+        $stock->save();
 
         return response()->json($order, 201);
     }
@@ -136,7 +156,8 @@ class OrdersController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="client_id", type="integer", example=1),
-     *             @OA\Property(property="product_id", type="integer", example=1)
+     *             @OA\Property(property="product_id", type="integer", example=1),
+     *             @OA\Property(property="quantity", type="integer", example=1)
      *         )
      *     ),
      *     @OA\Response(
@@ -162,11 +183,55 @@ class OrdersController extends Controller
         $validated = $request->validate([
             'client_id' => 'sometimes|required|exists:clients,id',
             'product_id' => 'sometimes|required|exists:products,id',
+            'quantity' => 'sometimes|required|integer|min:1',
         ]);
 
-        $order->update($validated);
+        DB::beginTransaction();
 
-        return response()->json($order);
+        try {
+            // Quantity update requires inventory control
+            if (isset($validated['quantity'])) {
+                $oldQuantity = $order->quantity;
+                $newQuantity = $validated['quantity'];
+
+                // Verifies if quantity has changed
+                if ($oldQuantity !== $newQuantity) {
+                    // Get the productId  
+                    $productId = $validated['product_id'] ?? $order->product_id;
+
+                    // Search the product stock
+                    $stock = ProductsStocks::where('product_id', $productId)->first();
+
+                    if (!$stock) {
+                        return response()->json(['message' => 'Stock not found for the product.'], 404);
+                    }
+
+                    $difference = $newQuantity - $oldQuantity;
+
+                    // If increasing the order quantity, check if there is enough stock
+                    if ($difference > 0 && $stock->stock < $difference) {
+                        return response()->json(['message' => 'Not enough stock available.'], 422);
+                    }
+
+                    // Apply the difference to the stock
+                    $stock->stock -= $difference;
+                    $stock->save();
+                }
+            }
+
+            $order->update($validated);
+
+            DB::commit();
+
+            return response()->json($order);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -199,8 +264,36 @@ class OrdersController extends Controller
      */
     public function destroy(Orders $order)
     {
-        $order->delete();
+        DB::beginTransaction();
 
-        return response()->json(null, 204);
+        try {
+            $productId = $order->product_id;
+            $quantity = $order->quantity;
+
+            // Search the product stock
+            $stock = ProductsStocks::where('product_id', $productId)->first();
+
+            if (!$stock) {
+                return response()->json(['message' => 'Stock not found for the product.'], 404);
+            }
+
+            // Returns the order quantity to the stock
+            $stock->stock += $quantity;
+            $stock->save();
+
+            // Deletes the order
+            $order->delete();
+
+            DB::commit();
+
+            return response()->json(null, 204);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Something went wrong.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
